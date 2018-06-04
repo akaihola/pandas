@@ -458,6 +458,30 @@ bar,foo"""
 
         tm.assert_frame_equal(pd.concat(reader), df)
 
+    @pytest.mark.parametrize(
+        'nrows, expect_position, expect_remainder',
+        [(4, 71, ('foo2,12,13,14,15\n'
+                  'bar2,12,13,14,15\n')),
+         (2, 39, ('baz,12,13,14,15\n'
+                  'qux,12,13,14,15\n'
+                  'foo2,12,13,14,15\n'
+                  'bar2,12,13,14,15\n')),
+         (1, 26, ('bar,7,8,9,10\n'
+                  'baz,12,13,14,15\n'
+                  'qux,12,13,14,15\n'
+                  'foo2,12,13,14,15\n'
+                  'bar2,12,13,14,15\n'))])
+    def test_stream_position_after_read_nrows(self, nrows,
+                                              expect_position,
+                                              expect_remainder):
+        expected = self.read_csv(StringIO(self.data1), index_col=0)
+        stream = StringIO(self.data1)
+        result = self.read_csv(stream, index_col=0, nrows=nrows)
+
+        tm.assert_frame_equal(result, expected[:nrows])
+        assert stream.tell() == expect_position
+        assert stream.read() == expect_remainder
+
     def test_read_text_list(self):
         data = """A,B,C\nfoo,1,2,3\nbar,4,5,6"""
         as_list = [['A', 'B', 'C'], ['foo', '1', '2', '3'], ['bar',
