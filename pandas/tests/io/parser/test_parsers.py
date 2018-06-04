@@ -8,6 +8,29 @@ import pandas.core.common as com
 from pandas._libs.tslib import Timestamp
 from pandas.compat import StringIO
 
+import pytest
+
+# Allow Pytest to rewrite assertions even if they appear in a helper module
+# imported from a test module.
+pytest.register_assert_rewrite(*("pandas.tests.io.parser.{}".format(m)
+                                 for m in ['common',
+                                           'header',
+                                           'comment',
+                                           'dialect',
+                                           'quoting',
+                                           'usecols',
+                                           'skiprows',
+                                           'index_col',
+                                           'na_values',
+                                           'converters',
+                                           'c_parser_only',
+                                           'parse_dates',
+                                           'compression',
+                                           'mangle_dupes',
+                                           'multithread',
+                                           'python_parser_only'
+                                           'dtypes']))
+
 from .common import ParserTests
 from .header import HeaderTests
 from .comment import CommentTests
